@@ -114,21 +114,16 @@ int main( int argc, char* argv[])
 		}
 	}
 
-
 	printf( "Params: \n net.nBranchesTurnover=%d\n net.connectivityParam=%f\n net.BSPTimeParam=%f\n net.homeostasisTimeParam=%f\n net.CREBTimeParam=%f\n net.inhibitionParam=%f\n net.globalPRPThresh=%f\n net.localPRPThresh=%f\n net.dendSpikeThresh=%f\n net.initWeight=%f\n net.maxWeight=%f\n net.setNlTypes = %d INClustered=%d\n" , 
-	net.nBranchesTurnover, net.connectivityParam , net.BSPTimeParam , net.homeostasisTimeParam , net.CREBTimeParam , net.inhibitionParam , net.globalPRPThresh , net.localPRPThresh , net.dendSpikeThresh , net.initWeight, net.maxWeight, net.setNlTypes, net.INClustered);
+	net.nBranchesTurnover, net.connectivityParam , net.BSPTimeParam , net.homeostasisTimeParam , net.CREBTimeParam , net.inhibitionParam , net.globalPRPThresh , net.localPRPThresh , net.dendSpikeThresh , net.initWeight, net.maxWeight, net.setNlTypes, net.INClustered );
 
 	LANetwork::SetRandomSeed(rseed);
 	net.disableCreb = disableCreb;
 
 	// Override;
 	ninputs = nonesperpattern * npatterns;
-
 	printf("\nNinputs=%d, nPerInput=%d, patterns=%d\n", ninputs, nperinput, npatterns);
-
 	net.CreateFearNet(nneurons, nbranches, ninputs, nperinput);
-
-
 
 	char buf[512];
 	if (suffix)

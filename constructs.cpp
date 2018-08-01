@@ -385,6 +385,7 @@ void LANetwork::CreateFearNet(int nneurons, int nbranches, int ninputs, int nneu
 	if (1) 
 	{
 
+
 		ConnectNeurons(this->pyr_list, this->in_pv, this->INClustered, 10.,  baseSyns, 1, 1.0, false);
 		ConnectNeurons(this->in_pv, this->pyr_list, 0, 10.,  10.*baseSyns, 1, 1.0, false);
 
@@ -392,8 +393,13 @@ void LANetwork::CreateFearNet(int nneurons, int nbranches, int ninputs, int nneu
 		ConnectNeurons(this->pyr_list, this->in_som, 0, 10.,  2*baseSyns, 1, 1.0, false);
 		ConnectNeurons(this->in_som, this->pyr_list, 0, 10., 4*baseSyns, 1, 1.0, false);
 
-		//ConnectNeurons(this->in_pv, this->in_pv, this->INClustered , 10., baseSyns, 1, 2.0, false);
-		//ConnectNeurons(this->in_som, this->in_som, this->INClustered , 10., baseSyns, 1, 2.0, false);
+		//ConnectNeurons(this->pyr_list, this->pyr_list, 0 , 10.,  baseSyns, 1, 1.0, false);
+		int ininclust = 0;
+		//ConnectNeurons(this->in_pv, this->in_pv, ininclust , 1., baseSyns, 1, 2.0, false);
+		//ConnectNeurons(this->in_som, this->in_som, ininclust , 1., baseSyns, 1, 2.0, false);
+
+		//ConnectNeurons(this->in_pv, this->in_som, ininclust , 1., baseSyns, 1, 2.0, false);
+		//ConnectNeurons(this->in_som, this->in_pv, ininclust , 1., baseSyns, 1, 2.0, false);
 
 	}
 
