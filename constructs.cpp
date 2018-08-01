@@ -158,6 +158,11 @@ void LANetwork::CreateNeurons(int number, int n_branches_per_neuron, char type, 
 				else if ( type == 'M')
 				{
 					bb->nlType = DEND_SUB;
+					//bb->nlType = DEND_LINEAR;
+					//bb->nlType = DEND_SUPRA;
+
+					//if (tt < 0.5*n_branches_per_neuron) bb->nlType = DEND_SUB;
+					//else bb->nlType = DEND_SUPRA;
 				}
 				else if (type == 'V')
 				{

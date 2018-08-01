@@ -28,9 +28,11 @@ cleanup:
 clean: cleanup
 	rm -f *.o lamodel.o* 
 
+cdata:
+	sh run_cluster.sh
+
 data:
-	sh run_sparse.sh
-	sh run_2.sh
+	sh run_serial.sh
 
 figs:
 	python an.py
