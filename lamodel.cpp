@@ -96,9 +96,11 @@ int main( int argc, char* argv[])
 					else if (!strcmp(optarg,  "homeostasisTimeParam")) net.homeostasisTimeParam = atof(val); 
 					else if (!strcmp(optarg,  "CREBTimeParam")) net.CREBTimeParam = atof(val); 
 					else if (!strcmp(optarg,  "inhibitionParam")) net.inhibitionParam = atof(val); 
+
 					else if (!strcmp(optarg,  "globalPRPThresh")) net.globalPRPThresh = atof(val); 
 					else if (!strcmp(optarg,  "localPRPThresh")) net.localPRPThresh = atof(val); 
 					else if (!strcmp(optarg,  "dendSpikeThresh")) net.dendSpikeThresh = atof(val); 
+
 					else if (!strcmp(optarg,  "initWeight")) net.initWeight*= atof(val); 
 					else if (!strcmp(optarg,  "maxWeight")) net.maxWeight*= atof(val); 
 					else if (!strcmp(optarg,  "stimDurationParam")) net.stimDurationParam = atof(val); 
@@ -107,22 +109,30 @@ int main( int argc, char* argv[])
 					else if (!strcmp(optarg,  "nBranchesTurnover")) net.nBranchesTurnover = atoi(val); 
 					else if (!strcmp(optarg,  "INClustered")) net.INClustered = atoi(val); 
 					else if (!strcmp(optarg,  "setNlTypes")) net.setNlTypes = atoi(val); 
+					else if (!strcmp(optarg,  "enableTurnover")) net.enableTurnover = atoi(val); 
 
-					printf("Param name='%s' value='%f'\n", optarg, atof(val));
+					else if (!strcmp(optarg,  "inSomaTau"))  net.inSomaTau  = atof(val);
+					else if (!strcmp(optarg,  "pyrSomaTau")) net.pyrSomaTau = atof(val);
+
+					else if (!strcmp(optarg,  "inDendrites")) net.inDendrites = atoi(val);
+					else { 
+						printf("[Error] Invalid option '%s'\n", optarg);
+						exit(1);
+					}
+
+					printf("[Option] '%s' value='%s'\n", optarg, val);
 				}
 			break;
 		}
 	}
 
-	printf( "Params: \n net.nBranchesTurnover=%d\n net.connectivityParam=%f\n net.BSPTimeParam=%f\n net.homeostasisTimeParam=%f\n net.CREBTimeParam=%f\n net.inhibitionParam=%f\n net.globalPRPThresh=%f\n net.localPRPThresh=%f\n net.dendSpikeThresh=%f\n net.initWeight=%f\n net.maxWeight=%f\n net.setNlTypes = %d INClustered=%d\n" , 
-	net.nBranchesTurnover, net.connectivityParam , net.BSPTimeParam , net.homeostasisTimeParam , net.CREBTimeParam , net.inhibitionParam , net.globalPRPThresh , net.localPRPThresh , net.dendSpikeThresh , net.initWeight, net.maxWeight, net.setNlTypes, net.INClustered );
 
 	LANetwork::SetRandomSeed(rseed);
 	net.disableCreb = disableCreb;
 
 	// Override;
 	ninputs = nonesperpattern * npatterns;
-	printf("\nNinputs=%d, nPerInput=%d, patterns=%d\n", ninputs, nperinput, npatterns);
+	printf("\nInputs=%d, neurons per input=%d, memories to encode=%d\n", ninputs, nperinput, npatterns);
 	net.CreateFearNet(nneurons, nbranches, ninputs, nperinput);
 
 	char buf[512];
@@ -130,7 +140,7 @@ int main( int argc, char* argv[])
 		sprintf(buf, "./data/%s", suffix );
 	else
 		sprintf(buf, "./data/N%d.B%d.I%d.i%d.P%d.p%d.T%d.S%d.w%d_%s", nneurons, nbranches, ninputs, nperinput, npatterns, nonesperpattern, interstim, rseed, (int)net.isWeakMem.size(),  suffix ? suffix : "");
-	cout << "Output dir: "<< buf <<  endl;
+	cout << "Output data dir: "<< buf <<  endl;
 
 	net.SetDataDir( buf);
 

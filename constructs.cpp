@@ -26,8 +26,10 @@ const int DEBUG_BID = 2270;
 const int DEBUG_SID = 3024;
 const int CUTOFF = 10.0;
 
-const float GPROD_CUTOFF = 18.0;
-const float BPROD_CUTOFF = 1.8;
+
+/// PROTEIN SYNTHESIS thresholds. When calcium crosses this value, proteins will be synthesized
+//const float GPROD_CUTOFF = 18.0; // Global ca threshold
+//const float BPROD_CUTOFF = 1.8;  // Dendrite ca threshold
 
 
 int LANetwork::RSEED = 1980;
@@ -55,6 +57,8 @@ inline float sigmoid(float x, float x0, float broad)
 
 
 
+// The alpha function for protein sythesis over time (x is time)
+
 inline double nuclearproteinalpha(float x)
 {
 	return (x>20.)*((x-20.*60.)/(30.*60)) * exp(1. - (x-20.*60. )/(30.*60.));
@@ -71,6 +75,7 @@ inline double nuclearproteinalpha(float x)
 
 
 
+// The alpha function for protein sythesis in dend branches over time (x is time)
 inline double branchproteinalpha(float x)
 {
 	return ((x)/(15.*60)) * exp(1. - (x )/(15.*60.));
@@ -95,6 +100,7 @@ inline float step_with_bounds(float cur_val, float dir, float max, float min)
 
 
 
+// the curve for the magnitude of LTP vs Ca++  . (x is calcium)
 inline float caDP(float x)
 {
 	//return x >0.2 ? 1.0 : 0.0;
@@ -108,6 +114,10 @@ inline float caDP(float x)
 }
 
 
+
+
+
+// Preallocate spikes in a list  of neurons
 inline void program_input(nrn_list lst, int tstart, int duration, float freq, float randomness, int limitActive = -1)
 {
 	int skip = 0;
@@ -128,6 +138,9 @@ inline void program_input(nrn_list lst, int tstart, int duration, float freq, fl
 }
 
 
+
+
+// Create a list of neurons
 void LANetwork::CreateNeurons(int number, int n_branches_per_neuron, char type, vector<LANeuron*>* appendTo = 0, int inputId =-1, int somethingDummy = 0)
 {
 	for (int i =0 ;i < number; i++)
@@ -151,11 +164,11 @@ void LANetwork::CreateNeurons(int number, int n_branches_per_neuron, char type, 
 				bb->bid = this->branches.size();
 				bb->neuron = n;
 
-				if (type == 'P') 
+				if (type == 'P')  // Pyramidals
 				{
 					bb->nlType = DEND_SUPRA;
 				}
-				else if ( type == 'M')
+				else if ( type == 'M') // SOM interneurons
 				{
 					bb->nlType = DEND_SUB;
 					//bb->nlType = DEND_LINEAR;
@@ -164,7 +177,7 @@ void LANetwork::CreateNeurons(int number, int n_branches_per_neuron, char type, 
 					//if (tt < 0.5*n_branches_per_neuron) bb->nlType = DEND_SUB;
 					//else bb->nlType = DEND_SUPRA;
 				}
-				else if (type == 'V')
+				else if (type == 'V') // basket interneurons
 				{
 					if (this->setNlTypes == DEND_SUPRA)
 					{
@@ -209,6 +222,7 @@ void LANetwork::CreateNeurons(int number, int n_branches_per_neuron, char type, 
 			appendTo->push_back(n);
 	}
 }
+
 
 
 
@@ -362,11 +376,12 @@ void LANetwork::CreateFearNet(int nneurons, int nbranches, int ninputs, int nneu
 	this->n_neurons_per_input = nneuronsperinput;
 	this->n_branches_per_neuron = nbranches;
 
+	// Create Pyrs
 	this->CreateNeurons(this->n_neurons*0.8, this->n_branches_per_neuron, 'P', &this->pyr_list, -1, this->nBranchesTurnover);
 
-	this->CreateNeurons(this->n_neurons*0.1, 10 , 'V', &this->in_pv); // PV
+	this->CreateNeurons(this->n_neurons*0.1, this->inDendrites , 'V', &this->in_pv); // PV
 
-	this->CreateNeurons(this->n_neurons*0.1, 10 , 'M', &this->in_som); // SOM
+	this->CreateNeurons(this->n_neurons*0.1, this->inDendrites , 'M', &this->in_som); // SOM
 
 	
 	for (int i=0;i < n_inputs;i++)
@@ -386,15 +401,15 @@ void LANetwork::CreateFearNet(int nneurons, int nbranches, int ninputs, int nneu
 	{
 
 
-		ConnectNeurons(this->pyr_list, this->in_pv, this->INClustered, 10.,  baseSyns, 1, 1.0, false);
-		ConnectNeurons(this->in_pv, this->pyr_list, 0, 10.,  10.*baseSyns, 1, 1.0, false);
+		ConnectNeurons(this->pyr_list, this->in_pv, this->INClustered, 10.,  2*baseSyns, 1, 1.0, false);
+		ConnectNeurons(this->in_pv, this->pyr_list, 0, 10.,  2*10.*baseSyns, 1, 1.0, false);
 
 		//baseSyns /=2.;
 		ConnectNeurons(this->pyr_list, this->in_som, 0, 10.,  2*baseSyns, 1, 1.0, false);
 		ConnectNeurons(this->in_som, this->pyr_list, 0, 10., 4*baseSyns, 1, 1.0, false);
 
 		//ConnectNeurons(this->pyr_list, this->pyr_list, 0 , 10.,  baseSyns, 1, 1.0, false);
-		int ininclust = 0;
+		//int ininclust = 0;
 		//ConnectNeurons(this->in_pv, this->in_pv, ininclust , 1., baseSyns, 1, 2.0, false);
 		//ConnectNeurons(this->in_som, this->in_som, ininclust , 1., baseSyns, 1, 2.0, false);
 
@@ -412,6 +427,7 @@ void LANetwork::CreateFearNet(int nneurons, int nbranches, int ninputs, int nneu
 	}
 
 
+	// Background stimulation
 	//ConnectNeurons(this->bg_list, this->pyr_list, 0.0, 10., 20*float(this->pyr_list.size()), 1, 0.6, false);
 
 	this->RecordInitialWeightSums();
@@ -444,7 +460,7 @@ void LANetwork::RunPattern(vector<int>& pattern, float hifreq,  float lowfreq, i
 				}
 			}
 			//printf("Total synaptic drive: %f\n", ts);
-			//*/
+			*/
 
 
 			program_input(this->inputs_cs[j], pad, duration, hifreq, 0.5, limitActive);
@@ -917,17 +933,17 @@ void LANetwork::StimDynamics(int duration) // stimulation dynamics, with dt=1mse
 
 				if (n->type == 'V') // PV interneuron
 	 			{
-					n->V +=  (soma_exc - soma_inh) - (n->V)/10.; // - n->wadapt*(n->V+10.0);
+					n->V +=  (soma_exc - soma_inh) - (n->V)/this->inSomaTau; // - n->wadapt*(n->V+10.0);
 					//n->wadapt -= n->wadapt/70.;
 				}
 				else if (n->type == 'M') // SOM interneuron
 	 			{
-					n->V +=  (soma_exc - soma_inh) - (n->V)/10.; // - n->wadapt*(n->V+10.0);
+					n->V +=  (soma_exc - soma_inh) - (n->V)/this->inSomaTau; // - n->wadapt*(n->V+10.0);
 					//n->wadapt -= n->wadapt/40.;
 				}
 				else
 				{
-					n->V +=  soma_exc - 3.0*soma_inh - (n->V)/30. -   n->wadapt*(n->V+10.0) ;
+					n->V +=  soma_exc - 3.0*soma_inh - (n->V)/(this->pyrSomaTau) -   n->wadapt*(n->V+10.0) ;
 
 					if (this->disableCreb)
 						n->wadapt -= n->wadapt/180.;
@@ -1116,7 +1132,7 @@ void LANetwork::Interstim(int durationSecs)
 
 
 			
-			if ( b->totcalc  > this->localPRPThresh*BPROD_CUTOFF) // This branch should produce PRPs now BPROD
+			if ( b->totcalc  > this->localPRPThresh) // This branch should produce PRPs now BPROD
 			{
 				b->prpTransients.push_back( pair<float,float>(T, b->totcalc));
 				//printf ("BID %d  NID %d BCALC=%f NCALC=%f S=%d\n", b->bid, nrn->nid, b->totcalc, nrnCalc, (int)b->prpTransients.size());
@@ -1148,7 +1164,7 @@ void LANetwork::Interstim(int durationSecs)
 
 		if (this->enablePlasticity)
 		{
-			if (nrnCalc > this->globalPRPThresh*GPROD_CUTOFF) /// GPROD
+			if (nrnCalc > this->globalPRPThresh) /// GPROD
 			{
 				nrn->prpTransients.push_back( pair<float,float>(T, nrnCalc) );
 
@@ -1415,7 +1431,7 @@ void LANetwork::Interstim(int durationSecs)
 	}
 	*/
 
-	//if (this->enablePlasticity) this->DoTurnover(durationSecs);
+	if (this->enablePlasticity && this->enableTurnover) this->DoTurnover(durationSecs);
 
 	this->isInterstim = false;
 }
@@ -1431,7 +1447,7 @@ void LANetwork::DoTurnover(float durationSecs )
 	for (branch_iter bi = this->branches.begin(); bi != this->branches.end(); bi++)
 	{
 		LABranch* b = *bi;
-		if (b->turnoverRate>0.0)
+		//if (b->turnoverRate>0.0)
 		{
 			vector<LASynapse*> v;
 			for (syn_iter si = b->synapses.begin(); si != b->synapses.end(); si++)

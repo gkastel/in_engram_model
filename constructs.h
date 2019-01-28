@@ -402,7 +402,7 @@ class LANetwork
 	vector< vector<float> > nrnVoltages; // ditto for voltages
 	map< pair<int, int>, double> distances; // holds euclidean between neurons if needed
 	static int RSEED;
-	int runningMode, runningPatternNo;
+	int runningMode, runningPatternNo, enableTurnover;
 	float localPRPThresh, globalPRPThresh;
 	float homeostasisTimeParam; // Time that it takes for synaptic scaling to be applied
 	float BSPTimeParam; // Time that it takes for BSP to  be applied
@@ -456,6 +456,10 @@ class LANetwork
 	float initWeight, maxWeight, dendSpikeThresh;
 	bool enablePruning, isPruningSynapses, INClustered;
 
+	float inSomaTau , pyrSomaTau;
+
+	int  inDendrites;
+
 	LANetwork()
 	{
 		enablePruning = isPruningSynapses = false;
@@ -482,8 +486,10 @@ class LANetwork
 		disableCreb = false;
 		homeostasisTime = 24.0;
 
-		localPRPThresh=1.0;
-		globalPRPThresh=1.0; 
+		localPRPThresh=1.8;
+
+		globalPRPThresh=18.0; 
+
 		homeostasisTimeParam = 1.0;
 		BSPTimeParam = 1.0;
 		CREBTimeParam = 1.0;
@@ -493,9 +499,17 @@ class LANetwork
 		dendSpikeThresh = 1.0;
 		initWeight = 0.3;
 		maxWeight = 1.0;
+
 		//turnoverHotspots =0;
-		setNlTypes = DEND_SUPRA;
+		
+		setNlTypes = DEND_LINEAR;
 		INClustered=0;
+		enableTurnover=0;
+
+		pyrSomaTau = 30.;
+		inSomaTau = 10.;
+
+		inDendrites = 10;
 	}
 
 
