@@ -48,7 +48,7 @@ int main( int argc, char* argv[])
 	int patternsOverlapping = -1;
 
 	LANetwork net; 
-	net.enablePruning = true; // default
+	net.enablePruning = false; // default
 
 	while ((c = getopt(argc, argv, "M:N:H:B:I:i:P:p:T:S:s:d:w:O:g:l:h:b:c:o:t:xnLDRJCGU"))!= -1)
 	{

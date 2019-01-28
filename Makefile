@@ -19,6 +19,10 @@ lamodel: $(OBJECTS) lamodel.o
 	g++  $(OBJECTS) lamodel.o -o lamodel -lm    -L/usr/local/lib/ # -lGLU -lglut 
 
 
+tests: $(OBJECTS) tests.o 
+	g++  $(OBJECTS) tests.o -o tests -lm    -L/usr/local/lib/ # -lGLU -lglut 
+
+
 remake: clean all
 
 cleanup:

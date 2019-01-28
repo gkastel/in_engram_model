@@ -141,7 +141,7 @@ inline void program_input(nrn_list lst, int tstart, int duration, float freq, fl
 
 
 // Create a list of neurons
-void LANetwork::CreateNeurons(int number, int n_branches_per_neuron, char type, vector<LANeuron*>* appendTo = 0, int inputId =-1, int somethingDummy = 0)
+void LANetwork::CreateNeurons(int number, int n_branches_per_neuron, char type, vector<LANeuron*>* appendTo, int inputId, int somethingDummy)
 {
 	for (int i =0 ;i < number; i++)
 	{
@@ -291,7 +291,7 @@ void LANetwork::AddSynapse(LANeuron* a, LABranch* br, float weight, bool isPlast
 
 
 
-int LANetwork::ConnectNeurons(vector<LANeuron*> fromList, vector<LANeuron*> toList, bool isClustered, float toDistance, int nNeuronPairs, int nSynapsesPerNeuron, float weight, bool isPlastic= false, bool randomizeweight = false, float overlap =-1.0)
+int LANetwork::ConnectNeurons(vector<LANeuron*> fromList, vector<LANeuron*> toList, bool isClustered, float toDistance, int nNeuronPairs, int nSynapsesPerNeuron, float weight, bool isPlastic , bool randomizeweight , float overlap)
 {
 	int tpairs =0;
 	while(true)
@@ -1503,6 +1503,37 @@ void LANetwork::Begin()
 	
 }
 
+
+
+void LANetwork::RunTests()
+{
+
+	LANetwork net; 
+
+	vector<LANeuron*> pyr;
+	vector<LANeuron*> inh;
+	vector<LANeuron*> inp;
+
+	net.CreateNeurons(10, 10, 'P', &pyr, -1, 0);
+	cout << (pyr.size() == 10) << endl;
+
+	net.CreateNeurons(10, 10, 'V', &inh, -1, 0);
+	cout << (inh.size() == 10) << endl;
+
+	net.CreateNeurons(10, 0, 'S', &inp, -1, 0);
+	cout << (inp.size() == 10) << endl;
+
+	for (nrn_iter na = pyr.begin(); na != pyr.end(); ++na)
+	{
+		LANeuron* nrn  = *na;;
+		cout << (nrn->type == 'P') << endl;
+	}
+
+	cout << (net.synapses.size() ==0 ) << endl;
+
+	net.ConnectNeurons(pyr, inh, false, (float)10.,  1000, 1, 1.0, false);
+	cout << (net.synapses.size()  == 1000) << endl;
+}
 
 
 

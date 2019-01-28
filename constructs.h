@@ -371,7 +371,7 @@ typedef vector< pair<float, float> >::iterator 	pair_iter;
 
 
 /* Global structure to hold network configuration */ 
-class LANetwork
+struct LANetwork
 {
 
 	public:
@@ -558,7 +558,7 @@ class LANetwork
 
 ;
 	/* Connect two sets of neurons , can specify minimum  / maximum allowed distances between pairs of neurons */
-	int ConnectNeurons(vector<LANeuron*> fromList, vector<LANeuron*> toList, bool IsClustered, float toDistance, int nNeuronPairs, int nSynapsesPerNeuron,float, bool, bool, float );
+	int ConnectNeurons(vector<LANeuron*> fromList, vector<LANeuron*> toList, bool isClustered, float toDistance, int nNeuronPairs, int nSynapsesPerNeuron, float weight, bool isPlastic= false, bool randomizeweight = false, float overlap =-1.0);
 
 	void AddSynapse(LANeuron* a, LABranch* br, float weight, bool isPlastic);
 	int ConnectInputs(vector<LANeuron*> fromList, vector<LANeuron*> toList, int nSynapses);
@@ -567,7 +567,7 @@ class LANetwork
 	int CreateInputSynapses( int totalToAdd);
 
 	/* Create a set of neurons and append them to specified list */
-	void CreateNeurons(int number, int branches_per_neuron, char type, vector<LANeuron*>* appendTo, int, int );
+	void CreateNeurons(int number, int n_branches_per_neuron, char type, vector<LANeuron*>* appendTo = 0, int inputId =-1, int somethingDummy = 0);
 
 	void CalculateDistances();
 
@@ -760,6 +760,9 @@ class LANetwork
 		}
 		ooo.close();
 	}
+
+
+	void RunTests();
 	
 };
 
